@@ -1,0 +1,24 @@
+# always needed, find the recommended latest version by looking it up on k8s website
+apiVersion: apps/v1
+kind: Deployment # super important, could be service, job - this tells what resource this is
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+metadata:
+  name: second-app-deployment
+spec: # the specification of the deployment
+  replicas: 1
+  selector:
+    matchLabels:
+      # why is selector needed? it is needed because what if you scale up your pods after a deployment is
+      # created? the new pods will match this label selector so they will also become managed by this
+      # deployment.
+      app: second-app
+      tier: backend
+  template: # template always describes a Pod object so you don't need kind: Pod
+    metadata:
+      labels:
+        app: second-app # can be any key value pair
+        tier: backend
+    spec: # the specification for the individual pods created for this deployment
+      containers: # remember you can have multiple containers in the same pod, so this is a list
+        - name: second-nodejsapp
+          image: mciaravi/kub-first-app:2
