@@ -22,3 +22,7 @@ spec: # the specification of the deployment
       containers: # remember you can have multiple containers in the same pod, so this is a list
         - name: second-nodejsapp
           image: mciaravi/kub-first-app:2
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
