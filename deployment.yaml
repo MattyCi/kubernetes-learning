@@ -26,3 +26,5 @@ spec: # the specification of the deployment
             httpGet:
               path: /
               port: 8080
+              periodSeconds: 10
+              initialDelaySeconds: 5
