@@ -1,0 +1,47 @@
+# you can have one big yaml file that contains both deployments and services
+
+# !!! when creating a service and deployment in one file, create the service first (list it first in the file)
+# because the deployment is dependent on the service (service needs to be up first) !!!
+
+apiVersion: v1 # this is just v1 because that's what the k8s docs says to use for services
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector: # identifies which other resources should be connected to this resource
+    # define which pods should be part of this service
+    # a service object exposes pods to the outside world
+    # you don't control deployments with a service, but you do control pods
+    # so we want to select the pods here we want the service to be associated with
+    # you can only select on labels for services, so matchLabels is not needed to be explicitly set
+    app: second-app
+  ports: # is a list, so you could map multiple ports
+    - protocol: 'TCP'
+      port: 80 # port the outside world is exposed to
+      targetPort: 8080 # port in the container
+  type: LoadBalancer
+--- # the three dashes is needed here because in yaml this signifies the start of a brand new object
+# always needed, find the recommended latest version by looking it up on k8s website
+apiVersion: apps/v1
+kind: Deployment # super important, could be service, job - this tells what resource this is
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+metadata:
+  name: second-app-deployment
+spec: # the specification of the deployment
+  replicas: 1
+  selector:
+    matchLabels:
+      # why is selector needed? it is needed because what if you scale up your pods after a deployment is
+      # created? the new pods will match this label selector so they will also become managed by this
+      # deployment.
+      app: second-app
+      tier: backend
+  template: # template always describes a Pod object so you don't need kind: Pod
+    metadata:
+      labels:
+        app: second-app # can be any key value pair
+        tier: backend
+    spec: # the specification for the individual pods created for this deployment
+      containers: # remember you can have multiple containers in the same pod, so this is a list
+        - name: second-nodejsapp
+          image: mciaravi/kub-first-app:2
