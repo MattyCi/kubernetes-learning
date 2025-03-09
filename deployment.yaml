@@ -22,9 +22,10 @@ spec: # the specification of the deployment
       containers: # remember you can have multiple containers in the same pod, so this is a list
         - name: second-nodejsapp
           image: mciaravi/kub-first-app:2
+          imagePullPolicy: Always
           livenessProbe:
             httpGet:
               path: /
               port: 8080
-              periodSeconds: 10
-              initialDelaySeconds: 5
+            periodSeconds: 10
+            initialDelaySeconds: 5
